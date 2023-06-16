@@ -109,6 +109,7 @@ function setStatusCode(res, code) {
 }
 
 /**
+ * 返回 bufferOrStream 文件内容
  * @template {IncomingMessage} Request
  * @template {ServerResponse} Response
  * @param {Request} req
@@ -118,6 +119,8 @@ function setStatusCode(res, code) {
  */
 function send(req, res, bufferOtStream, byteLength) {
   if (
+    // 管道只有 createReadStream 才有
+    // readFileSync 是没有 pipe
     typeof (/** @type {import("fs").ReadStream} */ (bufferOtStream).pipe) ===
     "function"
   ) {

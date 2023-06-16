@@ -186,10 +186,15 @@ function wdm(compiler, options = {}) {
    * @type {Context<RequestInternal, ResponseInternal>}
    */
   const context = {
+    // 编译结束与否，结束则 true
     state: false,
     // eslint-disable-next-line no-undefined
+    // 编译状态，为 webpack done hook 返回的值
+    // https://webpack.js.org/configuration/stats/#stats-presets
+    // stats 对象包含了构建的统计信息，包括 build 的时间、输出文件的大小、打包的模块数量等
     stats: undefined,
     callbacks: [],
+    // {}
     options,
     compiler,
     // @ts-ignore
@@ -198,7 +203,10 @@ function wdm(compiler, options = {}) {
     logger: compiler.getInfrastructureLogger("webpack-dev-middleware"),
     // @ts-ignore
     // eslint-disable-next-line no-undefined
-    outputFileSystem: undefined,
+    outputFileSystem: undefined, // memfs
+    // watching : webpack Watching 对象
+    //
+
   };
 
   setupHooks(context);
@@ -210,9 +218,11 @@ function wdm(compiler, options = {}) {
   setupOutputFileSystem(context);
 
   // Start watching
+  // false
   if (/** @type {Compiler} */ (context.compiler).watching) {
     context.watching = /** @type {Compiler} */ (context.compiler).watching;
   } else {
+    // 走这里
     /**
      * @type {WatchOptions | WatchOptions[]}
      */
@@ -244,6 +254,7 @@ function wdm(compiler, options = {}) {
           (childCompiler) => childCompiler.options.watchOptions || {}
         );
 
+        // 创建 watching 对象
       context.watching =
         /** @type {MultiWatching} */
         (

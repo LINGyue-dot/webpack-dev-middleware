@@ -21,6 +21,7 @@ const mem = (fn, { cache = new Map() } = {}) => {
    * @return {any}
    */
   const memoized = (...arguments_) => {
+    // key 是 publicPath 即 basePath
     const [key] = arguments_;
     const cacheItem = cache.get(key);
 
@@ -28,6 +29,7 @@ const mem = (fn, { cache = new Map() } = {}) => {
       return cacheItem.data;
     }
 
+    // url 对象
     const result = fn.apply(this, arguments_);
 
     cache.set(key, {
@@ -44,6 +46,7 @@ const mem = (fn, { cache = new Map() } = {}) => {
 const memoizedParse = mem(parse);
 
 /**
+ * 返回文件的绝对路径
  * @template {IncomingMessage} Request
  * @template {ServerResponse} Response
  * @param {import("../index.js").Context<Request, Response>} context
@@ -59,6 +62,23 @@ function getFilenameFromUrl(context, url) {
 
   try {
     // The `url` property of the `request` is contains only  `pathname`, `search` and `hash`
+    /**
+     * example
+     * Url {
+        protocol: 'https:',
+        slashes: true,
+        auth: null,
+        host: 'www.google.com',
+        port: null,
+        hostname: 'www.google.com',
+        hash: null,
+        search: '?q=url+nodejs',
+        query: 'q=url+nodejs',
+        pathname: '/search',
+        path: '/search?q=url+nodejs',
+        href: 'https://www.google.com/search?q=url+nodejs'
+      }
+     */
     urlObject = memoizedParse(url, false, true);
   } catch (_ignoreError) {
     return;
@@ -87,17 +107,20 @@ function getFilenameFromUrl(context, url) {
 
       // Strip the `pathname` property from the `publicPath` option from the start of requested url
       // `/complex/foo.js` => `foo.js`
+      // 找出相对路径
       const pathname = urlObject.pathname.slice(
         publicPathObject.pathname.length
       );
 
       if (pathname) {
+        // 输出文件的路径
         filename = path.join(outputPath, querystring.unescape(pathname));
       }
 
       let fsStats;
 
       try {
+        // 文件相关信息
         fsStats =
           /** @type {import("fs").statSync} */
           (context.outputFileSystem.statSync)(filename);

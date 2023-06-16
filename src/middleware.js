@@ -59,6 +59,9 @@ const BYTES_RANGE_REGEXP = /^ *bytes/i;
  */
 function wrapper(context) {
   return async function middleware(req, res, next) {
+    // GET HEAD 才会走中间件
+    // 浏览器请求 html js 等数据都是 get 请求
+    // head 请求：响应体不会返回、只包含响应头。一般用于判断一个资源是否存在
     const acceptedMethods = context.options.methods || ["GET", "HEAD"];
 
     // fixes #282. credit @cexoso. in certain edge situations res.locals is undefined.
@@ -73,6 +76,7 @@ function wrapper(context) {
 
     ready(context, processRequest, req);
 
+    // 不管什么请求，都等编译结束再进行处理返回
     async function goNext() {
       if (!context.options.serverSideRender) {
         return next();
@@ -81,6 +85,7 @@ function wrapper(context) {
       return new Promise((resolve) => {
         ready(
           context,
+          // 编译结束执行
           () => {
             /** @type {any} */
             // eslint-disable-next-line no-param-reassign
@@ -94,6 +99,7 @@ function wrapper(context) {
     }
 
     async function processRequest() {
+      //
       const filename = getFilenameFromUrl(
         context,
         /** @type {string} */ (req.url)
@@ -138,8 +144,10 @@ function wrapper(context) {
         );
       }
 
+      // 设置 content-type
       if (!getHeaderFromResponse(res, "Content-Type")) {
         // content-type name(like application/javascript; charset=utf-8) or false
+        // 获取文件对应的 content-type
         const contentType = mime.contentType(path.extname(filename));
 
         // Only set content-type header if media type is known

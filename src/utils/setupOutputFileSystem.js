@@ -5,6 +5,7 @@ const memfs = require("memfs");
 /** @typedef {import("../index.js").ServerResponse} ServerResponse */
 
 /**
+ * 设置 complier.outputFileSystem 为 memfs 的对象
  * @template {IncomingMessage} Request
  * @template {ServerResponse} Response
  * @param {import("../index.js").Context<Request, Response>} context
@@ -19,6 +20,8 @@ function setupOutputFileSystem(context) {
   }
   // Don't use `memfs` when developer wants to write everything to a disk, because it doesn't make sense.
   else if (context.options.writeToDisk !== true) {
+    // 设置了输出文件的根目录
+    // 这个路径是什么，打印出来的字符串是什么样？
     outputFileSystem = memfs.createFsFromVolume(new memfs.Volume());
   } else {
     const isMultiCompiler =
@@ -48,6 +51,7 @@ function setupOutputFileSystem(context) {
     (context.compiler).compilers || [context.compiler];
 
   for (const compiler of compilers) {
+    // 设置打包出去的路径
     compiler.outputFileSystem = outputFileSystem;
   }
 

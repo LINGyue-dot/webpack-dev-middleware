@@ -11,6 +11,7 @@
 /** @typedef {Exclude<Configuration["stats"], boolean | string | undefined>} NormalizedStatsOptions */
 
 /**
+ * 监听 webpack hook ，在 编译结束时候执行 context.callbacks
  * @template {IncomingMessage} Request
  * @template {ServerResponse} Response
  * @param {import("../index.js").Context<Request, Response>} context
@@ -154,6 +155,8 @@ function setupHooks(context) {
     });
   }
 
+  // compiler.hooks.watchRun.tap 方法用于向 webpack 的 WatchRun 钩子中注入回调函数，该钩子在文件中的某些修改被侦测到时触发。回调函数接收 compiler 实例作为参数，可以在其中执行一些自定义的操作。通常，WatchRun 钩子被用于在文件发生改变时执行某些特定任务，比如清除缓存、重载页面或者触发热模块替换（HMR）等。
+  // TODO 这个钩子函数相关的 改为 ctrl + s
   context.compiler.hooks.watchRun.tap("webpack-dev-middleware", invalid);
   context.compiler.hooks.invalid.tap("webpack-dev-middleware", invalid);
   context.compiler.hooks.done.tap("webpack-dev-middleware", done);

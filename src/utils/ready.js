@@ -2,6 +2,7 @@
 /** @typedef {import("../index.js").ServerResponse} ServerResponse */
 
 /**
+ * 执行 callback 时候 context.state = true 以及 context.stats = stats 编译结束
  * @template {IncomingMessage} Request
  * @template {ServerResponse} Response
  * @param {import("../index.js").Context<Request, Response>} context
