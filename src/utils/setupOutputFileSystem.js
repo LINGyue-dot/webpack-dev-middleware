@@ -20,8 +20,7 @@ function setupOutputFileSystem(context) {
   }
   // Don't use `memfs` when developer wants to write everything to a disk, because it doesn't make sense.
   else if (context.options.writeToDisk !== true) {
-    // 设置了输出文件的根目录
-    // 这个路径是什么，打印出来的字符串是什么样？
+    // 来 memfs 的 fs 对象
     outputFileSystem = memfs.createFsFromVolume(new memfs.Volume());
   } else {
     const isMultiCompiler =
